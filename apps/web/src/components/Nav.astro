@@ -1,0 +1,75 @@
+---
+import type { Category } from '../lib/types';
+import SearchBox from './SearchBox.astro';
+
+interface Props {
+  siteTitle: string;
+  categories: Category[];
+}
+const { siteTitle, categories } = Astro.props;
+const path = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="container nav-inner">
+    <a href="/" class="brand">{siteTitle}</a>
+    <nav class="tabs" aria-label="Categories">
+      {
+        categories.map((c) => (
+          <a
+            href={`/category/${c.slug}`}
+            class:list={['tab', { active: path === `/category/${c.slug}` }]}
+          >
+            {c.name}
+          </a>
+        ))
+      }
+    </nav>
+    <SearchBox />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    padding-block: var(--space-3);
+    flex-wrap: wrap;
+  }
+  .brand {
+    font-family: var(--font-heading);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .tabs {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-right: auto;
+  }
+  .tab {
+    color: var(--color-muted);
+    text-decoration: none;
+    font-weight: 500;
+    padding-bottom: 2px;
+    border-bottom: 2px solid transparent;
+  }
+  .tab:hover {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+  .tab.active {
+    color: var(--color-primary-dark);
+    border-bottom-color: var(--color-primary);
+  }
+</style>

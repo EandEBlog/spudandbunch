@@ -9,7 +9,7 @@ and webhook-driven rebuilds — all enforced by ESLint/Prettier, Husky hooks, Vi
 
 ## Current Phase
 
-Phase 4
+Phase 5
 
 ## Source of Truth
 
@@ -55,12 +55,13 @@ Phase 4
 
 ### Phase 4: Presentation + Theme (Photo Masonry)
 
-- [ ] `styles/tokens.css` (colors, fonts, spacing) structured for future per-section theming
-- [ ] `BaseLayout`, `PostLayout`; components: Nav, PostCard, Hero, RecipeCard, TagList, SearchBox
-- [ ] Pages: `index` (Photo Masonry), `posts/[slug]`, `category/[cat]`, `tag/[tag]`, `recommendations`, `about`
-- [ ] Astro image optimization on cover/inline images
-- **Acceptance:** Dev server renders real Strapi content; recipe posts show a recipe card; non-recipe posts don't; category tabs navigate.
-- **Status:** pending
+- [x] `styles/tokens.css` (warm/spiced palette, fonts, spacing) + `global.css`; structured for future per-section theming
+- [x] `BaseLayout`, `PostLayout`; components: Nav, PostCard, Hero, RecipeCard, TagList, SearchBox, Blocks (rich-text), StrapiImage
+- [x] Pages: `index` (Photo Masonry), `posts/[slug]`, `category/[slug]`, `tag/[slug]`, `recommendations`, `about`, `search` (placeholder for Phase 5)
+- [x] Astro image optimization via `<Image>` (remotePatterns for Strapi host) + lazy loading
+- **Acceptance:** ✅ Build generated 15 pages from seeded content; homepage masonry shows all posts + category tabs; recipe post renders the RecipeCard (Ingredients/Method/Serves), travel post has zero recipe markers; category/tag pages list their posts. 30 tests pass.
+- **Status:** complete
+- **Notes:** Build fetches Strapi at build time → added `STRAPI_OPTIONAL=true` (CI build) so an unreachable CMS yields an empty-but-valid site; prod builds leave it unset (fail loud). Added a guarded dev sample seeder (`SEED_SAMPLE=1`).
 
 ### Phase 5: Search (Pagefind)
 

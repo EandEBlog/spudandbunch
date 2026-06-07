@@ -1,0 +1,79 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StrapiImage from '../components/StrapiImage.astro';
+import { getRecommendations } from '../lib/content';
+
+const recommendations = await getRecommendations();
+---
+
+<BaseLayout
+  title="Recommendations"
+  description="Our favourite tools, places, restaurants and books."
+>
+  <section class="container section">
+    <span class="eyebrow">Our picks</span>
+    <h1>Recommendations</h1>
+
+    {
+      recommendations.length === 0 ? (
+        <p class="muted">Nothing here yet — recommendations are on the way.</p>
+      ) : (
+        <ul class="grid">
+          {recommendations.map((rec) => (
+            <li class="rec">
+              {rec.photo && <StrapiImage image={rec.photo} class="rec-img" />}
+              <div class="rec-body">
+                <span class="type">{rec.type}</span>
+                <h3>{rec.name}</h3>
+                {rec.blurb && <p class="muted">{rec.blurb}</p>}
+                {rec.link && (
+                  <a href={rec.link} rel="noopener" class="rec-link">
+                    Visit →
+                  </a>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  .section {
+    padding-block: var(--space-8);
+  }
+  .grid {
+    list-style: none;
+    padding: 0;
+    margin-top: var(--space-8);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--space-6);
+  }
+  .rec {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .rec :global(.rec-img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+  .rec-body {
+    padding: var(--space-4);
+  }
+  .rec-body h3 {
+    margin: var(--space-1) 0 var(--space-2);
+  }
+  .type {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+</style>

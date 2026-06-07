@@ -123,3 +123,36 @@
 - Confirmed Strapi 5 REST is **flat** (fields top-level, no v4 `attributes` wrapper); media populated as flat object with relative `url`.
 - Single-type endpoints: `/api/about-page`, `/api/site-setting` (404 = not-created-yet → mapped to null).
 - `strapi console` won't run piped stdin reliably here; for one-off CMS scripts prefer the document API another way. Login shells (`sh -lc`) drop the container PATH — use `sh -c`.
+
+## Session 5 — 2026-06-07
+
+### Done
+
+- **Phase 4 (Presentation + Theme) COMPLETE** on branch `phase-4-presentation`:
+  - Theme: `styles/tokens.css` (warm/spiced) + `global.css`; per-section theming hook documented.
+  - Components: Nav, SearchBox, Hero, PostCard, RecipeCard, TagList, Blocks (rich-text renderer), StrapiImage.
+  - Layouts: BaseLayout (nav/footer, fetches settings+categories), PostLayout.
+  - Pages: index (Photo Masonry), posts/[slug], category/[slug], tag/[slug], recommendations, about, search (Phase-5 placeholder).
+  - Astro `<Image>` for remote Strapi images (`remotePatterns`).
+  - Build resilience: `STRAPI_OPTIONAL=true` lets the CI build tolerate an unreachable CMS; wired into ci.yml build step.
+  - Dev sample seeder (`SEED_SAMPLE=1`, guarded) — seeded 3 sample posts to verify rendering.
+
+### Current state
+
+- Build generates 15 pages; verified recipe card on recipe post, none on travel post; masonry + category tabs render. 30 tests pass, lint clean.
+- Dev stack up; 3 sample posts published (delete in admin if unwanted). Branch not yet pushed.
+
+### Next actions
+
+- Commit Phase 4 → push → PR → merge.
+- Phase 5: Pagefind search (replace the search placeholder).
+
+### Test results
+
+- `npm test`: 30 passed (site 4, strapi 10, content 16).
+- `npm run build`: 15 pages (Strapi up). CI-sim (Strapi down + STRAPI_OPTIONAL): 4 pages, no error.
+
+### Notes
+
+- curl treats `[]` in URLs as globs → bracketed populate URLs fail in curl but work via `fetch` (data layer). Use `curl -g` or the data layer to test.
+- Sample-seed code lives in the CMS bootstrap, guarded by `SEED_SAMPLE` (dev only, idempotent).

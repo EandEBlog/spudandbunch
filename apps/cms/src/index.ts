@@ -62,6 +62,86 @@ async function grantPublicRead(strapi: Core.Strapi) {
   }
 }
 
+type Block = { type: 'paragraph'; children: { type: 'text'; text: string }[] };
+const para = (text: string): Block[] => [{ type: 'paragraph', children: [{ type: 'text', text }] }];
+
+async function findOrCreateTag(strapi: Core.Strapi, name: string, slug: string) {
+  const found = await strapi.documents('api::tag.tag').findMany({ filters: { slug }, limit: 1 });
+  return found[0] ?? (await strapi.documents('api::tag.tag').create({ data: { name, slug } }));
+}
+
+// Dev-only: seed a few published sample posts so the frontend has content to
+// render. Guarded by SEED_SAMPLE=1 and skipped if any post already exists.
+async function seedSamplePosts(strapi: Core.Strapi) {
+  const existing = await strapi.documents('api::post.post').findMany({ limit: 1 });
+  if (existing.length > 0) return;
+
+  const cats = await strapi.documents('api::category.category').findMany({});
+  const bySlug: Record<string, string> = Object.fromEntries(
+    cats.map((c) => [c.slug, c.documentId]),
+  );
+
+  const seafood = await findOrCreateTag(strapi, 'seafood', 'seafood');
+  const quick = await findOrCreateTag(strapi, 'quick', 'quick');
+  const portugal = await findOrCreateTag(strapi, 'portugal', 'portugal');
+  const technique = await findOrCreateTag(strapi, 'technique', 'technique');
+
+  const samples = [
+    {
+      title: 'Seared Scallops with Brown Butter',
+      slug: 'seared-scallops-with-brown-butter',
+      excerpt: 'Restaurant-quality scallops in under 15 minutes.',
+      category: bySlug['recipes'],
+      tags: [seafood.documentId, quick.documentId],
+      body: para(
+        'Pat the scallops very dry, sear them hard, and finish with nutty brown butter. The whole thing comes together faster than waiting on takeaway.',
+      ),
+      recipeDetails: {
+        prepTime: 10,
+        cookTime: 8,
+        servings: 2,
+        ingredients: [
+          { quantity: '8', item: 'large sea scallops' },
+          { quantity: '2', unit: 'tbsp', item: 'butter' },
+          { quantity: '1', unit: 'tbsp', item: 'olive oil' },
+          { item: 'Salt & pepper' },
+        ],
+        steps: [
+          { text: 'Pat scallops very dry and season well.' },
+          { text: 'Sear in hot oil 2 minutes per side until deeply golden.' },
+          { text: 'Add butter, baste for 30 seconds, and serve.' },
+        ],
+      },
+    },
+    {
+      title: 'A Weekend in Lisbon',
+      slug: 'a-weekend-in-lisbon',
+      excerpt: 'Pastéis de nata, tiled streets, and the best grilled sardines.',
+      category: bySlug['travel'],
+      tags: [portugal.documentId],
+      body: para(
+        'Two days of hills, trams, and custard tarts. Here is how we ate our way across Lisbon without missing the views.',
+      ),
+    },
+    {
+      title: 'Knife Skills 101',
+      slug: 'knife-skills-101',
+      excerpt: 'The three cuts that make every recipe faster.',
+      category: bySlug['cooking-tips'],
+      tags: [technique.documentId],
+      body: para(
+        'A sharp knife and a steady claw grip will change how you cook. Master the dice, the julienne, and the chiffonade.',
+      ),
+    },
+  ];
+
+  for (const data of samples) {
+    const created = await strapi.documents('api::post.post').create({ data });
+    await strapi.documents('api::post.post').publish({ documentId: created.documentId });
+    strapi.log.info(`[seed] sample post "${data.title}"`);
+  }
+}
+
 export default {
   /**
    * Runs before the application is initialized.
@@ -70,10 +150,14 @@ export default {
 
   /**
    * Runs before the application starts. Seeds launch categories and grants the
-   * public role read access (both idempotent — safe on every boot).
+   * public role read access (both idempotent — safe on every boot). Optionally
+   * seeds sample posts when SEED_SAMPLE=1 (dev only).
    */
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     await seedCategories(strapi);
     await grantPublicRead(strapi);
+    if (process.env.SEED_SAMPLE === '1') {
+      await seedSamplePosts(strapi);
+    }
   },
 };

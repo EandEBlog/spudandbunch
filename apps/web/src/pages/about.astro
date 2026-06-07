@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Blocks from '../components/Blocks.astro';
+import StrapiImage from '../components/StrapiImage.astro';
+import { getAboutPage } from '../lib/content';
+
+const about = await getAboutPage();
+---
+
+<BaseLayout title="About" description={about?.tagline}>
+  <section class="container about prose">
+    <h1>About</h1>
+    {about?.tagline && <p class="lead muted">{about.tagline}</p>}
+    {about?.portrait && <StrapiImage image={about.portrait} class="portrait" />}
+    {
+      about?.bio ? (
+        <Blocks content={about.bio} />
+      ) : (
+        <p class="muted">This page hasn’t been written yet.</p>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  .about {
+    padding-block: var(--space-8);
+    margin-inline: auto;
+  }
+  .lead {
+    font-size: var(--text-xl);
+    font-family: var(--font-heading);
+  }
+  .about :global(.portrait) {
+    width: 100%;
+    max-width: 18rem;
+    border-radius: var(--radius-lg);
+    margin: var(--space-6) 0;
+  }
+</style>

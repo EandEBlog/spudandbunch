@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getCategories, getPostsByCategory } from '../../lib/content';
+import type { Category } from '../../lib/types';
+
+export async function getStaticPaths() {
+  const categories = await getCategories();
+  return categories.map((category) => ({ params: { slug: category.slug }, props: { category } }));
+}
+
+interface Props {
+  category: Category;
+}
+const { category } = Astro.props;
+const posts = await getPostsByCategory(category.slug);
+---
+
+<BaseLayout title={category.name} description={category.description}>
+  <section class="container section">
+    <span class="eyebrow">Category</span>
+    <h1>{category.name}</h1>
+    {category.description && <p class="muted lead">{category.description}</p>}
+
+    {
+      posts.length === 0 ? (
+        <p class="muted">No posts in this category yet.</p>
+      ) : (
+        <div class="masonry">
+          {posts.map((post) => (
+            <PostCard post={post} />
+          ))}
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  .section {
+    padding-block: var(--space-8);
+  }
+  .lead {
+    font-size: var(--text-lg);
+    max-width: var(--prose-width);
+  }
+  .masonry {
+    columns: 3 280px;
+    column-gap: var(--space-6);
+    margin-top: var(--space-8);
+  }
+</style>

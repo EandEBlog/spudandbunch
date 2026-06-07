@@ -1,0 +1,23 @@
+---
+// A search field that submits to /search. Full client-side search (Pagefind)
+// is wired up in Phase 5; the page already exists so this never dead-ends.
+---
+
+<form class="search" method="get" action="/search" role="search">
+  <input type="search" name="q" placeholder="Search…" aria-label="Search posts" />
+</form>
+
+<style>
+  .search input {
+    font: inherit;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    min-width: 12rem;
+  }
+  .search input:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+  }
+</style>

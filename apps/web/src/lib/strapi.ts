@@ -43,14 +43,31 @@ interface FetchOptions {
 }
 
 /**
+ * When STRAPI_OPTIONAL=true, a connection failure (Strapi unreachable) resolves
+ * to null instead of throwing — so `astro build` can produce an empty-but-valid
+ * site in CI, where no Strapi is running. Real production builds leave this unset
+ * so a down CMS fails the build loudly rather than publishing an empty site.
+ */
+function strapiOptional(): boolean {
+  return typeof process !== 'undefined' && process.env?.STRAPI_OPTIONAL === 'true';
+}
+
+/**
  * Fetch a path from Strapi and return the parsed JSON envelope. Throws on
  * non-OK responses, except 404 when `allowNotFound` is set (returns null).
+ * A connection failure returns null only when STRAPI_OPTIONAL is set.
  */
 export async function strapiFetch<T>(
   path: string,
   { allowNotFound = false }: FetchOptions = {},
 ): Promise<T | null> {
-  const res = await fetch(`${STRAPI_URL}${path}`);
+  let res: Response;
+  try {
+    res = await fetch(`${STRAPI_URL}${path}`);
+  } catch (err) {
+    if (strapiOptional()) return null;
+    throw err;
+  }
 
   if (res.status === 404 && allowNotFound) return null;
   if (!res.ok) {

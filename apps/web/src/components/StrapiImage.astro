@@ -1,0 +1,33 @@
+---
+// Renders a Strapi image through Astro's <Image> so it is optimized (resized,
+// modern format, lazy-loaded) at build time. Falls back to inferred size when
+// Strapi didn't provide dimensions.
+import { Image } from 'astro:assets';
+import type { ImageAsset } from '../lib/types';
+
+interface Props {
+  image: ImageAsset;
+  class?: string;
+  loading?: 'lazy' | 'eager';
+  sizes?: string;
+}
+
+const { image, class: className, loading = 'lazy', sizes } = Astro.props;
+const hasDims = Boolean(image.width && image.height);
+---
+
+{
+  hasDims ? (
+    <Image
+      src={image.url}
+      width={image.width}
+      height={image.height}
+      alt={image.alt}
+      class={className}
+      loading={loading}
+      sizes={sizes}
+    />
+  ) : (
+    <Image src={image.url} inferSize alt={image.alt} class={className} loading={loading} />
+  )
+}
