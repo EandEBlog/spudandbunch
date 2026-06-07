@@ -53,6 +53,12 @@ services:
       # Reproducibly register the rebuild webhook on boot.
       REBUILD_WEBHOOK_URL: http://rebuild-hook:8080/webhook
       WEBHOOK_SECRET: ${WEBHOOK_SECRET:?set WEBHOOK_SECRET in .env}
+      # "Preview" button → preview service. PREVIEW_URL is how the author's
+      # browser reaches the preview service (e.g. https://preview.yoursite.com
+      # or http://your-host:4323).
+      PREVIEW_ENABLED: 'true'
+      PREVIEW_URL: ${PREVIEW_URL:?set PREVIEW_URL in .env}
+      PREVIEW_SECRET: ${PREVIEW_SECRET:?set PREVIEW_SECRET in .env}
     volumes:
       - strapi_uploads:/opt/app/public/uploads
     healthcheck:
@@ -84,6 +90,24 @@ services:
       SITE_DIR: /srv
     volumes:
       - site:/srv
+
+  preview:
+    build:
+      context: .
+      dockerfile: apps/preview/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      strapi:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 8080
+      # API token that can read drafts (create in Strapi → Settings → API Tokens).
+      PREVIEW_TOKEN: ${PREVIEW_TOKEN:?set PREVIEW_TOKEN in .env}
+      PREVIEW_SECRET: ${PREVIEW_SECRET:?set PREVIEW_SECRET in .env}
+    ports:
+      - '${PREVIEW_PORT:-4323}:8080' # reachable by the author's browser
 
   web:
     image: caddy:2-alpine

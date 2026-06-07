@@ -199,6 +199,22 @@ export async function getPost(slug: string): Promise<Post | null> {
   return first ? mapPost(first) : null;
 }
 
+/**
+ * A single post by its Strapi documentId, including the **draft** version —
+ * for the preview service. Requires an API token that can read drafts. Returns
+ * null if not found. Never used by the public build.
+ */
+export async function getDraftPost(
+  documentId: string,
+  token = typeof process !== 'undefined' ? process.env?.PREVIEW_TOKEN : undefined,
+): Promise<Post | null> {
+  const res = await strapiFetch<StrapiSingleResponse<RawPost>>(
+    `/api/posts/${encodeURIComponent(documentId)}?status=draft&${POST_POPULATE}`,
+    { authToken: token, allowNotFound: true },
+  );
+  return res?.data ? mapPost(res.data) : null;
+}
+
 /** Published posts in a category, newest first. */
 export async function getPostsByCategory(categorySlug: string): Promise<Post[]> {
   const res = await strapiFetch<StrapiListResponse<RawPost>>(

@@ -215,3 +215,33 @@
 - Builder is consolidated into rebuild-hook (no docker-socket one-shot container needed).
 - `strapi.webhookStore` isn't on the public Strapi TS type → access via a typed `unknown` cast + container `get` fallback.
 - Root `.env` (gitignored) drives the prod stack; dev stack still uses `apps/cms/.env`.
+
+## Session 8 — 2026-06-07
+
+### Done
+
+- Merged PR #7 (Phase 6).
+- **Phase 7 (Author Preview) COMPLETE** on branch `phase-7-preview` — **v1 feature-complete**:
+  - `apps/preview` Astro SSR app (own workspace, `@astrojs/node`) reusing apps/web `PostLayout` + new `getDraftPost` (auth token + `status=draft`). Route `/preview/[documentId]` gated by `PREVIEW_SECRET`.
+  - Draft banner via `preview` prop on `BaseLayout`/`PostLayout`. `strapiFetch` gained an `authToken` option.
+  - Strapi `config/admin.ts` preview handler (Preview button) → `${PREVIEW_URL}/preview/<id>?secret=…`.
+  - `apps/preview/Dockerfile` + `preview` service in `docker-compose.yml` (+ Strapi PREVIEW\_\* env). `.env.example` updated.
+
+### Current state
+
+- Verified end-to-end against dev Strapi: with secret → draft renders (banner + content); without → 401; bad id → 404; draft absent from public list. 31 tests, lint clean, both app builds pass, prod compose config valid (5 services).
+- Branch `phase-7-preview` not yet committed/pushed.
+
+### Next actions
+
+- Commit Phase 7 → push → PR → merge. Then v1 is done.
+
+### Test results
+
+- 31 unit tests pass (added auth-header test). web + preview builds OK.
+
+### Notes
+
+- `allowedOrigins` in Strapi preview config must be `string[]` (TS2322 if string).
+- Preview is its own SSR service so the public site stays pure static; reachable by the author's browser on PREVIEW_PORT (default 4323).
+- To exercise preview in dev: run `npm run dev -w apps/preview` and set PREVIEW_ENABLED/PREVIEW_URL/PREVIEW_SECRET on the dev Strapi.

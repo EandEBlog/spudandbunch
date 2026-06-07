@@ -40,6 +40,8 @@ export function mediaUrl(path: string | undefined | null): string | undefined {
 interface FetchOptions {
   /** When true, a 404 resolves to null instead of throwing (for single types). */
   allowNotFound?: boolean;
+  /** Bearer token for authenticated reads (e.g. drafts in the preview service). */
+  authToken?: string;
 }
 
 /**
@@ -59,11 +61,13 @@ function strapiOptional(): boolean {
  */
 export async function strapiFetch<T>(
   path: string,
-  { allowNotFound = false }: FetchOptions = {},
+  { allowNotFound = false, authToken }: FetchOptions = {},
 ): Promise<T | null> {
   let res: Response;
   try {
-    res = await fetch(`${STRAPI_URL}${path}`);
+    res = await fetch(`${STRAPI_URL}${path}`, {
+      headers: authToken ? { Authorization: `Bearer ${authToken}` } : undefined,
+    });
   } catch (err) {
     if (strapiOptional()) return null;
     throw err;
