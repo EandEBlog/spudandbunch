@@ -1,0 +1,30 @@
+{
+  "kind": "singleType",
+  "collectionName": "site_settings",
+  "info": {
+    "singularName": "site-setting",
+    "pluralName": "site-settings",
+    "displayName": "Site Settings",
+    "description": "Editable site-wide settings (title, tagline, footer, social links)."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "siteTitle": {
+      "type": "string",
+      "required": true,
+      "default": "Spud & Bunch"
+    },
+    "tagline": {
+      "type": "string"
+    },
+    "footerText": {
+      "type": "text"
+    },
+    "socialLinks": {
+      "type": "json"
+    }
+  }
+}

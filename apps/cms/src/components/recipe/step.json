@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_recipe_steps",
+  "info": {
+    "displayName": "Step",
+    "icon": "list",
+    "description": "A single recipe method step."
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

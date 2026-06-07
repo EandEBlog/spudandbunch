@@ -1,0 +1,21 @@
+{
+  "collectionName": "components_recipe_ingredients",
+  "info": {
+    "displayName": "Ingredient",
+    "icon": "bulletList",
+    "description": "A single recipe ingredient row."
+  },
+  "options": {},
+  "attributes": {
+    "quantity": {
+      "type": "string"
+    },
+    "unit": {
+      "type": "string"
+    },
+    "item": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

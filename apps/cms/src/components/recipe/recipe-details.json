@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_recipe_recipe_details",
+  "info": {
+    "displayName": "Recipe Details",
+    "icon": "restaurant",
+    "description": "Structured recipe fields. Present on a Post only when it is a recipe."
+  },
+  "options": {},
+  "attributes": {
+    "prepTime": {
+      "type": "integer",
+      "min": 0
+    },
+    "cookTime": {
+      "type": "integer",
+      "min": 0
+    },
+    "servings": {
+      "type": "integer",
+      "min": 1
+    },
+    "ingredients": {
+      "type": "component",
+      "repeatable": true,
+      "component": "recipe.ingredient"
+    },
+    "steps": {
+      "type": "component",
+      "repeatable": true,
+      "component": "recipe.step"
+    }
+  }
+}
