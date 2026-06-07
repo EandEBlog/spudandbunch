@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/TKLun/.claude/skills/**)",
+      "Read(//Users/TKLun/.claude/plugins/**)",
+      "Read(//Users/TKLun/.claude/**)"
+    ]
+  }
+}

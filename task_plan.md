@@ -1,8 +1,8 @@
-# Task Plan: Sea Salt & Spice — Implementation
+# Task Plan: Spud & Bunch — Implementation
 
 ## Goal
 Build a dockerized Astro (SSG) + Strapi food/cooking/travel blog per the approved spec
-(`docs/superpowers/specs/2026-06-06-sea-salt-and-spice-design.md`): non-technical authoring,
+(`docs/superpowers/specs/2026-06-06-spud-and-bunch-design.md`): non-technical authoring,
 taggable/categorized posts, full-text search, structured recipes, single-page author preview,
 and webhook-driven rebuilds — all enforced by ESLint/Prettier, Husky hooks, Vitest, and CI.
 
@@ -10,7 +10,7 @@ and webhook-driven rebuilds — all enforced by ESLint/Prettier, Husky hooks, Vi
 Phase 1
 
 ## Source of Truth
-- Spec: `docs/superpowers/specs/2026-06-06-sea-salt-and-spice-design.md`
+- Spec: `docs/superpowers/specs/2026-06-06-spud-and-bunch-design.md`
 - Core principle: strict Data (`lib/`) / Presentation (`components/`,`layouts/`) / Theme (`styles/tokens.css`) separation.
 - Homepage layout: **Photo Masonry** (decided).
 

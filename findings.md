@@ -1,4 +1,4 @@
-# Findings: Sea Salt & Spice
+# Findings: Spud & Bunch
 
 ## Approved design decisions (from spec, 2026-06-06)
 - **Stack:** Astro (SSG) + Strapi (self-hosted) + Postgres + Pagefind + nginx/Caddy, all in docker-compose.

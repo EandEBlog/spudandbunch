@@ -1,8 +1,8 @@
-# Sea Salt & Spice — Design Specification
+# Spud & Bunch — Design Specification
 
 **Date:** 2026-06-06
 **Status:** Approved design (pending final user review)
-**Working name:** "Sea Salt & Spice" (subject to change — site title/tagline are editable content, not hardcoded)
+**Working name:** "Spud & Bunch" (subject to change — site title/tagline are editable content, not hardcoded)
 
 ## 1. Overview
 
@@ -323,7 +323,7 @@ a small blog; revisit only if the site grows complex.
 Monorepo:
 
 ```
-seasaltandspice/
+spudandbunch/
 ├── apps/
 │   ├── web/            Astro frontend (lib, components, layouts, pages, styles)
 │   ├── cms/            Strapi project (schema, config)

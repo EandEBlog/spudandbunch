@@ -1,10 +1,10 @@
-# Progress Log: Sea Salt & Spice
+# Progress Log: Spud & Bunch
 
 ## Session 1 — 2026-06-06
 
 ### Done
 - Completed brainstorming/design phase; spec written, reviewed, approved, committed:
-  `docs/superpowers/specs/2026-06-06-sea-salt-and-spice-design.md`.
+  `docs/superpowers/specs/2026-06-06-spud-and-bunch-design.md`.
 - Homepage layout decided: **Photo Masonry**.
 - Installed `planning-with-files` skill; created `task_plan.md`, `findings.md`, `progress.md`.
 
