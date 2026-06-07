@@ -1,0 +1,6 @@
+# Ensure a compatible Node (project pins 20 via .nvmrc; the machine default is older).
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && nvm use --silent 2>/dev/null
+
+# Full gate before code leaves the machine: lint everything + run the whole test suite.
+npm run lint && npm test

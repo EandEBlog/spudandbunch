@@ -1,5 +1,19 @@
+# Dependencies
 node_modules/
-.superpowers/
-.env
+
+# Build output
 dist/
+.astro/
+
+# Environment / secrets (keep .env.example tracked)
+.env
+.env.*
+!.env.example
+
+# Local/editor noise
+*.local
 .DS_Store
+
+# Brainstorming companion (ephemeral)
+.superpowers/
+.claude/settings.local.json
