@@ -39,7 +39,13 @@ const footerText = settings?.footerText ?? `© ${new Date().getFullYear()} ${sit
     <Nav siteTitle={siteTitle} categories={categories} />
     <main><slot /></main>
     <footer class="site-footer">
-      <div class="container">{footerText}</div>
+      <div class="container">
+        <nav class="footer-nav" aria-label="Footer">
+          <a href="/about">About</a>
+          <a href="/recommendations">Recommendations</a>
+        </nav>
+        <p class="footer-text">{footerText}</p>
+      </div>
     </footer>
 
     <style>
@@ -59,6 +65,19 @@ const footerText = settings?.footerText ?? `© ${new Date().getFullYear()} ${sit
         padding-block: var(--space-8);
         margin-top: var(--space-16);
         text-align: center;
+      }
+      .footer-nav {
+        display: flex;
+        gap: var(--space-6);
+        justify-content: center;
+        margin-bottom: var(--space-3);
+      }
+      .footer-nav a {
+        color: var(--color-text);
+        font-weight: 500;
+      }
+      .footer-text {
+        margin: 0;
       }
     </style>
   </body>
