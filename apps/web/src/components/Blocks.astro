@@ -1,8 +1,12 @@
 ---
-// Renders Strapi "blocks" rich content to HTML. Handles paragraphs, headings,
-// lists, quotes, code, images, and inline marks/links. Text is escaped (authors
-// are trusted, but we never inject raw text unescaped).
+// Renders Strapi "blocks" rich content. Text blocks (paragraphs, headings,
+// lists, quotes, code) are emitted as escaped HTML. Image blocks are rendered
+// through Astro's <Image> so inline body images are optimized and baked into the
+// static build — self-hosted, with no runtime dependency on Strapi (same as the
+// cover image).
+import StrapiImage from './StrapiImage.astro';
 import { mediaUrl } from '../lib/strapi';
+import type { ImageAsset } from '../lib/types';
 
 interface Props {
   content: unknown;
@@ -37,6 +41,7 @@ function childrenHtml(children: any[] | undefined): string {
   return (children ?? []).map(inlineToHtml).join('');
 }
 
+// HTML for a single non-image block. Image blocks are handled in the template.
 function blockToHtml(b: any): string {
   switch (b?.type) {
     case 'paragraph': {
@@ -58,25 +63,40 @@ function blockToHtml(b: any): string {
       return `<blockquote>${childrenHtml(b.children)}</blockquote>`;
     case 'code':
       return `<pre><code>${esc((b.children ?? []).map((c: any) => c.text ?? '').join('\n'))}</code></pre>`;
-    case 'image': {
-      const url = mediaUrl(b.image?.url);
-      return url
-        ? `<img src="${esc(url)}" alt="${esc(b.image?.alternativeText ?? '')}" loading="lazy" />`
-        : '';
-    }
     default: {
       const inner = childrenHtml(b.children);
       return inner ? `<p>${inner}</p>` : '';
     }
   }
 }
+
+// Map a block's image object to our ImageAsset (absolute URL + dimensions).
+function toImageAsset(b: any): ImageAsset | null {
+  const url = mediaUrl(b?.image?.url);
+  if (!url) return null;
+  return {
+    url,
+    alt: b.image?.alternativeText ?? '',
+    width: b.image?.width,
+    height: b.image?.height,
+  };
+}
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-const blocks = Array.isArray(content) ? content : [];
-const html = blocks.map(blockToHtml).join('\n');
+const blocks: unknown[] = Array.isArray(content) ? content : [];
 ---
 
-<div class="prose-body" set:html={html} />
+<div class="prose-body">
+  {
+    blocks.map((block) => {
+      if ((block as { type?: string })?.type === 'image') {
+        const img = toImageAsset(block);
+        return img ? <StrapiImage image={img} class="body-img" /> : null;
+      }
+      return <Fragment set:html={blockToHtml(block)} />;
+    })
+  }
+</div>
 
 <style>
   .prose-body :global(p),
@@ -90,9 +110,12 @@ const html = blocks.map(blockToHtml).join('\n');
   .prose-body :global(h3) {
     margin-top: var(--space-8);
   }
+  .prose-body :global(.body-img),
   .prose-body :global(img) {
     border-radius: var(--radius);
     margin: var(--space-6) 0;
+    width: 100%;
+    height: auto;
   }
   .prose-body :global(blockquote) {
     border-left: 3px solid var(--color-primary);
