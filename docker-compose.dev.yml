@@ -38,6 +38,9 @@ services:
       - ./apps/cms/.env
     environment:
       NODE_ENV: development
+      # Dev toggle: `SEED_SAMPLE=1 docker compose ... up -d --force-recreate strapi`
+      # seeds a few sample posts on boot (skipped if posts already exist).
+      SEED_SAMPLE: ${SEED_SAMPLE:-}
       DATABASE_CLIENT: postgres
       DATABASE_HOST: postgres
       DATABASE_PORT: 5432

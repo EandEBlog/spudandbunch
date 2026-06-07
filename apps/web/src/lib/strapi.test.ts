@@ -75,4 +75,20 @@ describe('strapiFetch', () => {
 
     await expect(strapiFetch('/api/posts')).rejects.toThrow(/404/);
   });
+
+  it('rethrows a connection failure by default', async () => {
+    delete process.env.STRAPI_OPTIONAL;
+    (globalThis.fetch as Mock).mockRejectedValueOnce(new Error('ECONNREFUSED'));
+    await expect(strapiFetch('/api/posts')).rejects.toThrow(/ECONNREFUSED/);
+  });
+
+  it('returns null on a connection failure when STRAPI_OPTIONAL=true', async () => {
+    process.env.STRAPI_OPTIONAL = 'true';
+    (globalThis.fetch as Mock).mockRejectedValueOnce(new Error('ECONNREFUSED'));
+    try {
+      await expect(strapiFetch('/api/posts')).resolves.toBeNull();
+    } finally {
+      delete process.env.STRAPI_OPTIONAL;
+    }
+  });
 });

@@ -1,0 +1,48 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import { getSiteSettings, getCategories } from '../lib/content';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title, description } = Astro.props;
+
+// Global shell data (nav + footer). The data layer is the only thing that talks
+// to Strapi; the layout just orchestrates what every page needs.
+const [settings, categories] = await Promise.all([getSiteSettings(), getCategories()]);
+const siteTitle = settings?.siteTitle ?? 'Spud & Bunch';
+const pageTitle = title ? `${title} · ${siteTitle}` : siteTitle;
+const footerText = settings?.footerText ?? `© ${new Date().getFullYear()} ${siteTitle}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <Nav siteTitle={siteTitle} categories={categories} />
+    <main><slot /></main>
+    <footer class="site-footer">
+      <div class="container">{footerText}</div>
+    </footer>
+
+    <style>
+      .site-footer {
+        border-top: 1px solid var(--color-border);
+        background: var(--color-surface);
+        color: var(--color-muted);
+        font-size: var(--text-sm);
+        padding-block: var(--space-8);
+        margin-top: var(--space-16);
+        text-align: center;
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+---
+import PostLayout from '../../layouts/PostLayout.astro';
+import { getPosts } from '../../lib/content';
+import type { Post } from '../../lib/types';
+
+// One static page per published post. getPosts already deep-populates everything
+// a post page needs, so we pass the full post through as a prop (no re-fetch).
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+interface Props {
+  post: Post;
+}
+const { post } = Astro.props;
+---
+
+<PostLayout post={post} />

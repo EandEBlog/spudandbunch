@@ -1,0 +1,106 @@
+---
+import type { RecipeDetails } from '../lib/types';
+
+interface Props {
+  recipe: RecipeDetails;
+}
+const { recipe } = Astro.props;
+
+const meta = [
+  recipe.prepTime != null ? { label: 'Prep', value: `${recipe.prepTime} min` } : null,
+  recipe.cookTime != null ? { label: 'Cook', value: `${recipe.cookTime} min` } : null,
+  recipe.servings != null ? { label: 'Serves', value: String(recipe.servings) } : null,
+].filter((x): x is { label: string; value: string } => x !== null);
+---
+
+<aside class="recipe">
+  <h2>Recipe</h2>
+
+  {
+    meta.length > 0 && (
+      <dl class="meta">
+        {meta.map((m) => (
+          <div class="meta-item">
+            <dt>{m.label}</dt>
+            <dd>{m.value}</dd>
+          </div>
+        ))}
+      </dl>
+    )
+  }
+
+  {
+    recipe.ingredients.length > 0 && (
+      <div class="section">
+        <h3>Ingredients</h3>
+        <ul class="ingredients">
+          {recipe.ingredients.map((i) => (
+            <li>
+              {[i.quantity, i.unit].filter(Boolean).join(' ')} {i.item}
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+
+  {
+    recipe.steps.length > 0 && (
+      <div class="section">
+        <h3>Method</h3>
+        <ol class="steps">
+          {recipe.steps.map((s) => (
+            <li>{s.text}</li>
+          ))}
+        </ol>
+      </div>
+    )
+  }
+</aside>
+
+<style>
+  .recipe {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    margin: var(--space-8) 0;
+  }
+  .recipe h2 {
+    margin-top: 0;
+    color: var(--color-primary-dark);
+  }
+  .meta {
+    display: flex;
+    gap: var(--space-6);
+    margin: 0 0 var(--space-6);
+    padding: 0;
+    border-block: 1px solid var(--color-border);
+    padding-block: var(--space-3);
+  }
+  .meta-item dt {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-muted);
+  }
+  .meta-item dd {
+    margin: 0;
+    font-weight: 600;
+    font-size: var(--text-lg);
+  }
+  .section {
+    margin-top: var(--space-4);
+  }
+  .section h3 {
+    font-size: var(--text-lg);
+  }
+  .ingredients,
+  .steps {
+    padding-left: var(--space-6);
+  }
+  .ingredients li,
+  .steps li {
+    margin-bottom: var(--space-2);
+  }
+</style>

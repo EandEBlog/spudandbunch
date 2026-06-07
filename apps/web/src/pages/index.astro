@@ -1,19 +1,41 @@
 ---
-// Placeholder homepage. The real Photo Masonry homepage arrives in Phase 4.
-import { siteName } from '../lib/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import PostCard from '../components/PostCard.astro';
+import { getPosts, getSiteSettings } from '../lib/content';
+
+const [posts, settings] = await Promise.all([getPosts(), getSiteSettings()]);
+const title = settings?.siteTitle ?? 'Spud & Bunch';
+const tagline = settings?.tagline ?? 'Food, cooking & travel — one plate at a time.';
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{siteName}</title>
-  </head>
-  <body>
-    <main>
-      <h1>{siteName}</h1>
-      <p>Food, cooking &amp; travel — coming soon.</p>
-    </main>
-  </body>
-</html>
+<BaseLayout description={tagline}>
+  <Hero title={title} tagline={tagline} />
+
+  <div class="container">
+    {
+      posts.length === 0 ? (
+        <p class="empty muted">No posts yet — check back soon.</p>
+      ) : (
+        <div class="masonry">
+          {posts.map((post) => (
+            <PostCard post={post} />
+          ))}
+        </div>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .masonry {
+    columns: 3 280px;
+    column-gap: var(--space-6);
+    margin-block: var(--space-8) var(--space-16);
+  }
+  .empty {
+    text-align: center;
+    padding-block: var(--space-16);
+    font-size: var(--text-lg);
+  }
+</style>

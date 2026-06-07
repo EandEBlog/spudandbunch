@@ -1,0 +1,111 @@
+---
+// Renders Strapi "blocks" rich content to HTML. Handles paragraphs, headings,
+// lists, quotes, code, images, and inline marks/links. Text is escaped (authors
+// are trusted, but we never inject raw text unescaped).
+import { mediaUrl } from '../lib/strapi';
+
+interface Props {
+  content: unknown;
+}
+const { content } = Astro.props;
+
+function esc(s: unknown): string {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function inlineToHtml(node: any): string {
+  if (node?.type === 'link') {
+    const inner = (node.children ?? []).map(inlineToHtml).join('');
+    return `<a href="${esc(node.url)}" rel="noopener">${inner}</a>`;
+  }
+  let t = esc(node?.text ?? '');
+  if (!t) return '';
+  if (node.code) t = `<code>${t}</code>`;
+  if (node.bold) t = `<strong>${t}</strong>`;
+  if (node.italic) t = `<em>${t}</em>`;
+  if (node.underline) t = `<u>${t}</u>`;
+  if (node.strikethrough) t = `<s>${t}</s>`;
+  return t;
+}
+
+function childrenHtml(children: any[] | undefined): string {
+  return (children ?? []).map(inlineToHtml).join('');
+}
+
+function blockToHtml(b: any): string {
+  switch (b?.type) {
+    case 'paragraph': {
+      const inner = childrenHtml(b.children);
+      return inner.trim() ? `<p>${inner}</p>` : '';
+    }
+    case 'heading': {
+      const lvl = Math.min(Math.max(Number(b.level) || 2, 1), 6);
+      return `<h${lvl}>${childrenHtml(b.children)}</h${lvl}>`;
+    }
+    case 'list': {
+      const tag = b.format === 'ordered' ? 'ol' : 'ul';
+      const items = (b.children ?? [])
+        .map((li: any) => `<li>${childrenHtml(li.children)}</li>`)
+        .join('');
+      return `<${tag}>${items}</${tag}>`;
+    }
+    case 'quote':
+      return `<blockquote>${childrenHtml(b.children)}</blockquote>`;
+    case 'code':
+      return `<pre><code>${esc((b.children ?? []).map((c: any) => c.text ?? '').join('\n'))}</code></pre>`;
+    case 'image': {
+      const url = mediaUrl(b.image?.url);
+      return url
+        ? `<img src="${esc(url)}" alt="${esc(b.image?.alternativeText ?? '')}" loading="lazy" />`
+        : '';
+    }
+    default: {
+      const inner = childrenHtml(b.children);
+      return inner ? `<p>${inner}</p>` : '';
+    }
+  }
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
+const blocks = Array.isArray(content) ? content : [];
+const html = blocks.map(blockToHtml).join('\n');
+---
+
+<div class="prose-body" set:html={html} />
+
+<style>
+  .prose-body :global(p),
+  .prose-body :global(ul),
+  .prose-body :global(ol),
+  .prose-body :global(blockquote),
+  .prose-body :global(pre) {
+    margin: 0 0 var(--space-4);
+  }
+  .prose-body :global(h2),
+  .prose-body :global(h3) {
+    margin-top: var(--space-8);
+  }
+  .prose-body :global(img) {
+    border-radius: var(--radius);
+    margin: var(--space-6) 0;
+  }
+  .prose-body :global(blockquote) {
+    border-left: 3px solid var(--color-primary);
+    padding-left: var(--space-4);
+    color: var(--color-muted);
+    font-style: italic;
+  }
+  .prose-body :global(pre) {
+    background: #2b2420;
+    color: #f5efe7;
+    padding: var(--space-4);
+    border-radius: var(--radius);
+    overflow-x: auto;
+    font-size: var(--text-sm);
+  }
+</style>

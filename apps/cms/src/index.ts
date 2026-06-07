@@ -1,4 +1,5 @@
 import type { Core } from '@strapi/strapi';
+import { seedSamplePosts } from './seed/sample-posts';
 
 // The four launch categories (idempotently seeded on boot). Authors can add
 // more in the admin UI; these just guarantee a sensible starting taxonomy.
@@ -70,10 +71,14 @@ export default {
 
   /**
    * Runs before the application starts. Seeds launch categories and grants the
-   * public role read access (both idempotent — safe on every boot).
+   * public role read access (both idempotent — safe on every boot). Optionally
+   * seeds sample posts when SEED_SAMPLE=1 (dev only).
    */
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     await seedCategories(strapi);
     await grantPublicRead(strapi);
+    if (process.env.SEED_SAMPLE === '1') {
+      await seedSamplePosts(strapi);
+    }
   },
 };
