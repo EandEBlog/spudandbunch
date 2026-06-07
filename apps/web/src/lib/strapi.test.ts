@@ -40,7 +40,22 @@ describe('strapiFetch', () => {
     const out = await strapiFetch<typeof body>('/api/categories');
 
     expect(out).toEqual(body);
-    expect(globalThis.fetch).toHaveBeenCalledWith(`${STRAPI_URL}/api/categories`);
+    const [url, init] = (globalThis.fetch as Mock).mock.calls[0];
+    expect(url).toBe(`${STRAPI_URL}/api/categories`);
+    expect(init?.headers).toBeUndefined(); // no auth header without a token
+  });
+
+  it('sends a Bearer auth header when a token is given', async () => {
+    (globalThis.fetch as Mock).mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({}),
+    });
+
+    await strapiFetch('/api/posts/abc?status=draft', { authToken: 'tok123' });
+
+    const init = (globalThis.fetch as Mock).mock.calls[0][1];
+    expect(init.headers).toEqual({ Authorization: 'Bearer tok123' });
   });
 
   it('throws on a non-OK response', async () => {

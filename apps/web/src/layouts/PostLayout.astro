@@ -8,8 +8,10 @@ import type { Post } from '../lib/types';
 
 interface Props {
   post: Post;
+  /** Render the draft-preview banner (set by the preview service). */
+  preview?: boolean;
 }
-const { post } = Astro.props;
+const { post, preview = false } = Astro.props;
 
 const date = post.publishedAt
   ? new Date(post.publishedAt).toLocaleDateString('en-US', {
@@ -20,7 +22,7 @@ const date = post.publishedAt
   : null;
 ---
 
-<BaseLayout title={post.title} description={post.excerpt}>
+<BaseLayout title={post.title} description={post.excerpt} preview={preview}>
   <article class="container post" data-pagefind-body>
     <header class="post-header prose">
       {

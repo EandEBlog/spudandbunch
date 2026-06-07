@@ -6,7 +6,8 @@
   "type": "module",
   "comment:workspaces": "apps/cms (Strapi) is intentionally excluded — it is a self-contained, dockerized service that manages its own dependencies inside its container. Node services we lint/test/build (web, and later rebuild-hook/preview) are listed explicitly.",
   "workspaces": [
-    "apps/web"
+    "apps/web",
+    "apps/preview"
   ],
   "engines": {
     "node": ">=20.3.0"

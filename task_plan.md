@@ -9,7 +9,7 @@ and webhook-driven rebuilds — all enforced by ESLint/Prettier, Husky hooks, Vi
 
 ## Current Phase
 
-Phase 7
+✅ All phases complete — v1 feature-complete.
 
 ## Source of Truth
 
@@ -84,10 +84,11 @@ Phase 7
 
 ### Phase 7: Author Preview (single-page)
 
-- [ ] `preview` service: authenticated single-page render of one draft straight from Strapi
-- [ ] Wire Strapi "Preview" button to the preview URL
-- **Acceptance:** A logged-in author sees an unpublished draft via Preview; the public site does not expose it.
-- **Status:** pending
+- [x] `apps/preview` — Astro SSR service that reuses apps/web's `PostLayout` + data layer (`getDraftPost`) to render one draft on demand; gated by a shared `PREVIEW_SECRET`, reads drafts via a server-side `PREVIEW_TOKEN`. Draft banner in `BaseLayout`.
+- [x] Strapi "Preview" button wired via `config/admin.ts` preview handler → `${PREVIEW_URL}/preview/<documentId>?secret=…`; preview service added to `docker-compose.yml` + Dockerfile + env docs.
+- **Acceptance:** ✅ Verified — preview WITH secret renders the unpublished draft (exact template + banner); WITHOUT secret → 401; bad id → 404; the draft is absent from the public published list. 31 tests pass.
+- **Status:** complete
+- **Notes:** `apps/preview` is its own workspace (cross-app import of apps/web works), so the production static build is untouched. `PUBLIC_STRAPI_URL` is baked at preview image build time (Vite inlines PUBLIC\_ vars).
 
 ## Decisions Pending (implementation-time)
 
