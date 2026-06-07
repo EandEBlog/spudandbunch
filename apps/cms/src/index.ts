@@ -1,5 +1,6 @@
 import type { Core } from '@strapi/strapi';
 import { seedSamplePosts } from './seed/sample-posts';
+import { seedRebuildWebhook } from './seed/webhook';
 
 // The four launch categories (idempotently seeded on boot). Authors can add
 // more in the admin UI; these just guarantee a sensible starting taxonomy.
@@ -77,6 +78,7 @@ export default {
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
     await seedCategories(strapi);
     await grantPublicRead(strapi);
+    await seedRebuildWebhook(strapi);
     if (process.env.SEED_SAMPLE === '1') {
       await seedSamplePosts(strapi);
     }
