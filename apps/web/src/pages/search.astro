@@ -1,19 +1,52 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-// Full client-side search (Pagefind) is built in Phase 5. This page exists now
-// so the header search field never dead-ends.
+// Full-text search powered by Pagefind. The index is generated at build time
+// (`astro build && pagefind --site dist`) and queried entirely client-side — no
+// server calls. The header search box links here with ?q=…; we trigger it below.
 ---
 
 <BaseLayout title="Search" description="Search Spud & Bunch.">
   <section class="container section">
     <h1>Search</h1>
-    <p class="muted">Search is coming soon — full-text search across every post.</p>
+    <div id="search" data-pagefind-ignore></div>
+    <p id="search-fallback" class="muted" hidden>
+      Search isn’t available in dev mode — it’s generated during the production build (<code
+        >npm run build</code
+      > then <code>npm run preview</code>).
+    </p>
   </section>
 </BaseLayout>
+
+<link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+
+<script is:inline src="/pagefind/pagefind-ui.js"></script>
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', () => {
+    if (typeof PagefindUI === 'undefined') {
+      document.getElementById('search-fallback')?.removeAttribute('hidden');
+      return;
+    }
+    const ui = new PagefindUI({
+      element: '#search',
+      showSubResults: true,
+      showImages: false,
+      pageSize: 10,
+    });
+    const q = new URLSearchParams(window.location.search).get('q');
+    if (q) ui.triggerSearch(q);
+  });
+</script>
 
 <style>
   .section {
     padding-block: var(--space-8);
-    min-height: 40vh;
+    min-height: 50vh;
+  }
+  #search {
+    margin-top: var(--space-6);
+    --pagefind-ui-primary: var(--color-primary-dark);
+    --pagefind-ui-font: var(--font-body);
+    --pagefind-ui-border: var(--color-border);
+    --pagefind-ui-border-radius: var(--radius);
   }
 </style>
