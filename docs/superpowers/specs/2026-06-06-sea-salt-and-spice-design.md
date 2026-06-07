@@ -146,7 +146,11 @@ apps/web/src/
 
 ### Public pages (v1)
 
-1. **Homepage** (`/`) — featured + recent posts. Layout TBD (see §9).
+1. **Homepage** (`/`) — **Photo Masonry layout** (chosen): an image-first,
+   Pinterest-style grid of varied photo sizes that puts the food/travel
+   photography front and center. Each tile links to its post. (May be revisited
+   with the site owner's wife; per §2 this is a presentation-only change that
+   touches no content, schema, or data-layer code.)
 2. **Post page** (`/posts/<slug>`) — article: title, hero image, body, author,
    category, tags; renders a structured recipe card when `recipeDetails` present.
 3. **Category page** (`/category/<cat>`) — all posts in a category.
@@ -301,14 +305,12 @@ a small blog; revisit only if the site grows complex.
 
 ## 9. Open / Deferred Decisions
 
-- **Homepage layout** — deferred for review with the site owner's wife. Three
-  candidate directions captured during design:
-  - **A · Hero + Grid** — featured post on top, grid of recent posts (magazine).
-  - **B · Editorial Minimal** — calm centered column, large type, big stacked photos.
-  - **C · Photo Masonry** — Pinterest-style image-first grid.
-  Mockups saved under `.superpowers/brainstorm/`. This decision does not block
-  implementation of the data model, CMS, tooling, or non-homepage pages, and—per
-  §2—can be made/changed later without touching content, schema, or data layer.
+- **Homepage layout** — **DECIDED: C · Photo Masonry** (image-first Pinterest-style
+  grid). Candidates considered: A · Hero + Grid (magazine), B · Editorial Minimal
+  (calm centered column), C · Photo Masonry (chosen). Mockups saved under
+  `.superpowers/brainstorm/`. May still be revisited with the site owner's wife;
+  per §2 this is a presentation-only change that touches no content, schema, or
+  data-layer code.
 - **Optional recipe `steps` field** — include a structured repeatable `steps`
   list, or keep method in the post `body`? Default: optional `steps`, falls back
   to `body`.
