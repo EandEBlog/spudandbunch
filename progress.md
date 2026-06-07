@@ -72,7 +72,7 @@
 
 ### Current state
 
-- Dev stack is UP (postgres + strapi). Admin: http://localhost:1337/admin (ernie@spudandbunch.local / Spudbunch123!).
+- Dev stack is UP (postgres + strapi). Admin: http://localhost:1337/admin (user `ernie@spudandbunch.local`; local dev password set via CLI — not recorded here).
 - Branch `phase-2-cms`, not yet committed/pushed.
 
 ### Next actions
