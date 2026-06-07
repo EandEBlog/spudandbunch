@@ -90,3 +90,36 @@
 
 - Fixed boot error: Strapi requires singularName ≠ pluralName → renamed `site-settings` API to singular `site-setting` (plural `site-settings`).
 - Strapi schema/folder convention: UID `api::<dir>.<singularName>`.
+
+## Session 4 — 2026-06-07
+
+### Done
+
+- Added root `README.md` (prereqs, running CMS, persistence, admin recovery, commands, status); redacted local dev password from this log.
+- Trimmed Strapi `config/database.ts` to Postgres-only (part of Phase 2 PR follow-up).
+- **Phase 3 (Astro data layer) COMPLETE** on branch `phase-3-data-layer`:
+  - `apps/web/src/lib/types.ts` (domain types), `strapi.ts` (client: env base URL, fetch wrapper w/ 404→null, `mediaUrl`), `content.ts` (typed getters + raw→domain mappers).
+  - Enabled public read on the Strapi API via idempotent `grantPublicRead` in the CMS bootstrap.
+  - 28 Vitest tests (mocked v5 fixtures); `lib/` coverage 100% stmts/lines/funcs. Added `@vitest/coverage-v8` + `test:coverage`.
+  - Live smoke test (vite-node) against real Strapi: returns 4 seeded categories, single-type 404→null handled.
+
+### Current state
+
+- Branch `phase-3-data-layer` (also carries README + db trim). Dev stack still up.
+- All gates green: lint clean, 28 tests, coverage 100% lines on lib/.
+
+### Next actions
+
+- Commit Phase 3 → push → PR → merge.
+- Phase 4: presentation + theme (Photo Masonry homepage, components, pages).
+
+### Test results
+
+- `npm test`: 28 passed (site 4, strapi 8, content 16).
+- Coverage (lib/): 100% statements/lines/functions, 71% branch.
+
+### Notes
+
+- Confirmed Strapi 5 REST is **flat** (fields top-level, no v4 `attributes` wrapper); media populated as flat object with relative `url`.
+- Single-type endpoints: `/api/about-page`, `/api/site-setting` (404 = not-created-yet → mapped to null).
+- `strapi console` won't run piped stdin reliably here; for one-off CMS scripts prefer the document API another way. Login shells (`sh -lc`) drop the container PATH — use `sh -c`.

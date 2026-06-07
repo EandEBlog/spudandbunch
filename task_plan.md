@@ -9,7 +9,7 @@ and webhook-driven rebuilds — all enforced by ESLint/Prettier, Husky hooks, Vi
 
 ## Current Phase
 
-Phase 3
+Phase 4
 
 ## Source of Truth
 
@@ -45,11 +45,13 @@ Phase 3
 
 ### Phase 3: Astro Data Layer (`lib/`) — pure + tested
 
-- [ ] `lib/strapi.ts` (REST client), `lib/content.ts` (getPosts/getPost/getCategories/getTags/getRecommendations/getAbout/getSettings)
-- [ ] `lib/types.ts` (Post, Category, Tag, Author, Recommendation, RecipeDetails)
-- [ ] Vitest units against mocked Strapi responses: parsing, missing-field handling, sort/filter
-- **Acceptance:** Tests green; ~80% coverage on `lib/`; no markup/styling in `lib/`.
-- **Status:** pending
+- [x] `lib/strapi.ts` (REST client: base URL from env, fetch wrapper w/ 404→null, mediaUrl) + `lib/content.ts` (getPosts/getPost/getPostsByCategory/getPostsByTag/getCategories/getTags/getRecommendations/getAboutPage/getSiteSettings)
+- [x] `lib/types.ts` (Post, Category, Tag, Author, Recommendation, RecipeDetails, Ingredient, RecipeStep, ImageAsset, AboutPage, SiteSettings)
+- [x] Vitest units against mocked Strapi v5 responses: parsing, media absolutization, missing-field handling, sort/filter, single-type 404→null (28 tests)
+- [x] Enabled public read on the API via idempotent bootstrap (`grantPublicRead`)
+- **Acceptance:** ✅ 28 tests pass; `lib/` coverage 100% stmts/lines/funcs (branch 71%); pure TS (no markup); live smoke test against real Strapi returns the 4 seeded categories + handles 404→null.
+- **Status:** complete
+- **Notes:** Confirmed Strapi 5 flat REST shape (no `attributes` wrapper). Added `@vitest/coverage-v8` + `test:coverage` script.
 
 ### Phase 4: Presentation + Theme (Photo Masonry)
 

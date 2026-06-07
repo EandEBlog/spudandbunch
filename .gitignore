@@ -17,3 +17,6 @@ dist/
 # Brainstorming companion (ephemeral)
 .superpowers/
 .claude/settings.local.json
+
+# Test coverage reports
+coverage/
