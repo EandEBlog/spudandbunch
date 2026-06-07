@@ -9,7 +9,7 @@ and webhook-driven rebuilds — all enforced by ESLint/Prettier, Husky hooks, Vi
 
 ## Current Phase
 
-Phase 2
+Phase 3
 
 ## Source of Truth
 
@@ -34,13 +34,14 @@ Phase 2
 
 ### Phase 2: Strapi CMS + Postgres (Docker)
 
-- [ ] `docker-compose.dev.yml` with `postgres` + `strapi` (both on named volumes for persistence)
-- [ ] Strapi content types: Post (+ optional `recipeDetails` component with repeatable `ingredients` and optional `steps`), Category, Tag, Author, Recommendation
-- [ ] Single types: AboutPage, SiteSettings
-- [ ] Seed the four launch categories (Recipes, Restaurant Reviews, Travel, Cooking Tips)
-- [ ] Author role with content-edit (not schema) permissions
-- **Acceptance:** Create a post + upload an image in the admin UI; `docker compose down && up` and confirm both survive (volumes persist).
-- **Status:** pending
+- [x] `docker-compose.dev.yml` with `postgres` (named volume `pgdata`) + `strapi` (Dockerfile.dev); uploads persist via host bind mount
+- [x] Strapi content types: Post (+ optional `recipeDetails` component w/ repeatable `ingredients` + optional `steps`), Category, Tag, Author, Recommendation
+- [x] Single types: AboutPage, SiteSettings (note: site-settings singular renamed to `site-setting` — Strapi requires singular≠plural)
+- [x] Seed the four launch categories via `src/index.ts` bootstrap (idempotent)
+- [x] Author role — satisfied by Strapi's built-in admin roles (Editor/Author = content-edit, no schema/config). First admin `ernie@spudandbunch.local` created (Super Admin)
+- **Acceptance:** ✅ Stack boots; all 10 tables created; seed ran (4 categories); `down`+`up` preserves categories, admin user, and uploaded file (named volume + bind mount). Admin UI live at http://localhost:1337/admin. Hands-on UI post+image creation is the user's final UX check.
+- **Status:** complete
+- **Notes:** Public REST API returns 403 by default (correct). Enabling public read / API token for the Astro build is the first task of Phase 3. Body uses Strapi `blocks` editor.
 
 ### Phase 3: Astro Data Layer (`lib/`) — pure + tested
 

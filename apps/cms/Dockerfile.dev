@@ -1,0 +1,25 @@
+# Strapi (development). Runs `strapi develop` with watch/hot-reload.
+# Debian slim is used (not alpine) so sharp's prebuilt binaries install cleanly.
+FROM node:20-bookworm-slim
+
+WORKDIR /opt/app
+
+# Build tools some native deps may need during install.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends build-essential python3 \
+  && rm -rf /var/lib/apt/lists/*
+
+ENV NODE_ENV=development
+ENV PATH=/opt/app/node_modules/.bin:$PATH
+
+# Install dependencies first (better layer caching). No lockfile yet (scaffolded
+# with --no-install), so a plain install generates one inside the image.
+COPY package.json package-lock.json* ./
+RUN npm install
+
+# App source. At runtime the dev compose bind-mounts the host source over this
+# and keeps node_modules in an anonymous volume, so edits hot-reload.
+COPY . .
+
+EXPOSE 1337
+CMD ["npm", "run", "develop"]

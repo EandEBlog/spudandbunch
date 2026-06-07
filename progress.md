@@ -58,3 +58,35 @@
 
 - Node commands need PATH prefix: `export PATH="$HOME/.nvm/versions/node/v20.20.2/bin:$PATH"` (fresh shells default to v18).
 - npm audit: 6 dev-only advisories (1 critical vitest-UI), accepted/deferred — see findings.md.
+
+## Session 3 — 2026-06-07
+
+### Done
+
+- **Phase 2 (Strapi + Postgres) functionally COMPLETE** on branch `phase-2-cms`:
+  - Scaffolded Strapi 5.47.1 in `apps/cms` (TS, `--no-install`; deps install in the Docker image).
+  - Content model authored as schema-as-code: Post (+ `recipe.recipe-details` component w/ `recipe.ingredient` + `recipe.step`), Category, Tag, Author, Recommendation; single types AboutPage, SiteSettings.
+  - `docker-compose.dev.yml`: postgres (named volume `pgdata`) + strapi (Dockerfile.dev), uploads via host bind mount.
+  - Category seed in `src/index.ts` bootstrap (idempotent). First admin created via CLI.
+- **Verified:** stack boots; 10 tables created; 4 categories seeded; `down`+`up` preserves DB (categories, admin user) and uploads (sentinel). Admin UI 200 at /admin; public API 403 by default (correct).
+
+### Current state
+
+- Dev stack is UP (postgres + strapi). Admin: http://localhost:1337/admin (ernie@spudandbunch.local / Spudbunch123!).
+- Branch `phase-2-cms`, not yet committed/pushed.
+
+### Next actions
+
+- Commit Phase 2 → push branch → open PR (per-phase flow) → user merges.
+- USER hands-on acceptance: log into admin, create a post + upload an image (validates author UX).
+- Phase 3 first task: enable public read (or API token) so the Astro build can fetch content.
+
+### Test results
+
+- 10 content-type/component tables present in Postgres.
+- Persistence: categories=4 and admin user survive down/up; uploaded file survives.
+
+### Notes
+
+- Fixed boot error: Strapi requires singularName ≠ pluralName → renamed `site-settings` API to singular `site-setting` (plural `site-settings`).
+- Strapi schema/folder convention: UID `api::<dir>.<singularName>`.

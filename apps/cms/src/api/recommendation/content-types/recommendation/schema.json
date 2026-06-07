@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "recommendations",
+  "info": {
+    "singularName": "recommendation",
+    "pluralName": "recommendations",
+    "displayName": "Recommendation",
+    "description": "A curated recommendation (tool, restaurant, place, or book)."
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "photo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": ["images"]
+    },
+    "blurb": {
+      "type": "text"
+    },
+    "link": {
+      "type": "string"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["Tool", "Restaurant", "Place", "Book"],
+      "required": true
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

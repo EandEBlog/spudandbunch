@@ -1,0 +1,55 @@
+# Development stack: Postgres + Strapi (CMS). Brought up with:
+#   docker compose -f docker-compose.dev.yml up --build
+#
+# Data persistence:
+#   - Postgres content lives in the named volume `pgdata` (survives down/up).
+#   - Strapi media uploads live on the host via the bind mount at
+#     ./apps/cms/public/uploads (also survives down/up).
+#   Both are only wiped by an explicit `docker compose ... down -v`.
+name: spudandbunch-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: strapi
+      POSTGRES_PASSWORD: strapi
+      POSTGRES_DB: strapi
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U strapi -d strapi']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  strapi:
+    build:
+      context: ./apps/cms
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Secrets (APP_KEYS, *_SALT, *_SECRET, ENCRYPTION_KEY) come from apps/cms/.env
+    # (gitignored). DB connection is set explicitly below to target the service.
+    env_file:
+      - ./apps/cms/.env
+    environment:
+      NODE_ENV: development
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: strapi
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapi
+      DATABASE_SSL: 'false'
+    ports:
+      - '1337:1337'
+    volumes:
+      - ./apps/cms:/opt/app
+      - /opt/app/node_modules
+
+volumes:
+  pgdata:
