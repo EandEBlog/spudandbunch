@@ -17,10 +17,10 @@ export async function seedSamplePosts(strapi: Core.Strapi) {
     cats.map((c) => [c.slug, c.documentId]),
   );
 
-  const seafood = await findOrCreateTag(strapi, 'seafood', 'seafood');
-  const quick = await findOrCreateTag(strapi, 'quick', 'quick');
-  const portugal = await findOrCreateTag(strapi, 'portugal', 'portugal');
-  const technique = await findOrCreateTag(strapi, 'technique', 'technique');
+  const seafood = await findOrCreateTag(strapi, 'seafood');
+  const quick = await findOrCreateTag(strapi, 'quick');
+  const portugal = await findOrCreateTag(strapi, 'portugal');
+  const technique = await findOrCreateTag(strapi, 'technique');
 
   const samples = [
     {
