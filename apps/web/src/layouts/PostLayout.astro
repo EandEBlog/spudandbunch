@@ -21,7 +21,7 @@ const date = post.publishedAt
 ---
 
 <BaseLayout title={post.title} description={post.excerpt}>
-  <article class="container post">
+  <article class="container post" data-pagefind-body>
     <header class="post-header prose">
       {
         post.category && (
@@ -30,7 +30,7 @@ const date = post.publishedAt
           </a>
         )
       }
-      <h1>{post.title}</h1>
+      <h1 data-pagefind-meta="title">{post.title}</h1>
       <p class="meta muted">
         {post.author && <span>By {post.author.name}</span>}
         {post.author && date && <span> · </span>}
@@ -54,6 +54,14 @@ const date = post.publishedAt
       {post.recipe && <RecipeCard recipe={post.recipe} />}
       <TagList tags={post.tags} />
     </div>
+
+    {
+      /* Pagefind facets — indexed but visually hidden (not display:none, so Pagefind reads them). */
+    }
+    <div class="pf-meta">
+      {post.category && <span data-pagefind-filter="Category">{post.category.name}</span>}
+      {post.tags.map((t) => <span data-pagefind-filter="Tag">{t.name}</span>)}
+    </div>
   </article>
 
   <style>
@@ -76,6 +84,15 @@ const date = post.publishedAt
       border-radius: var(--radius-lg);
       margin: var(--space-6) auto var(--space-8);
       max-width: var(--content-width);
+    }
+    /* Screen-reader-only (NOT display:none, so Pagefind still indexes the facets). */
+    .pf-meta {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
     }
   </style>
 </BaseLayout>

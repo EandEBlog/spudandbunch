@@ -9,7 +9,7 @@ and webhook-driven rebuilds — all enforced by ESLint/Prettier, Husky hooks, Vi
 
 ## Current Phase
 
-Phase 5
+Phase 6
 
 ## Source of Truth
 
@@ -65,10 +65,11 @@ Phase 5
 
 ### Phase 5: Search (Pagefind)
 
-- [ ] Integrate Pagefind into the build to index titles + bodies
-- [ ] `search.astro` + SearchBox UI; combinable with category/tag filters
-- **Acceptance:** Searching a known term returns the expected posts client-side, no server calls.
-- **Status:** pending
+- [x] Integrate Pagefind into the build (`astro build && pagefind --site dist`); post pages marked `data-pagefind-body` so titles + bodies are indexed
+- [x] `search.astro` (Pagefind UI, reads `?q=`) + header SearchBox; Category/Tag exposed as `data-pagefind-filter` facets
+- **Acceptance:** ✅ Pagefind indexed 3 post pages / 101 words / 2 filters; index contains title + body terms (scallops, Lisbon, julienne); preview serves search page + pagefind assets (200); search runs client-side (static WASM + index, no server).
+- **Status:** complete
+- **Notes:** Search only works on the built/preview site, not `astro dev` (index is build-time). Using Pagefind Default UI.
 
 ### Phase 6: Production Stack (build + serve + rebuild)
 

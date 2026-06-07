@@ -156,3 +156,34 @@
 
 - curl treats `[]` in URLs as globs → bracketed populate URLs fail in curl but work via `fetch` (data layer). Use `curl -g` or the data layer to test.
 - Sample-seed code lives in the CMS bootstrap, guarded by `SEED_SAMPLE` (dev only, idempotent).
+
+## Session 6 — 2026-06-07
+
+### Done
+
+- Merged PR #4 (Phase 4) and PR #5 (inline body images → Astro `<Image>` pipeline; recovered cleanly after an early merge).
+- CMS seeder cleanup: extracted `seed/sample-posts.ts` + `seed/utils.ts`; `findOrCreateTag` derives slug via shared `slugify`.
+- **Phase 5 (Pagefind search) COMPLETE** on branch `phase-5-search`:
+  - Build = `astro build && pagefind --site dist`; `pagefind` devDep.
+  - PostLayout marked `data-pagefind-body` (+ `data-pagefind-meta="title"`); Category/Tag as `data-pagefind-filter` facets (sr-only block).
+  - `search.astro` uses Pagefind Default UI, reads `?q=`; header SearchBox links to `/search?q=`.
+
+### Current state
+
+- Pagefind indexed 3 posts / 101 words / 2 filters; title+body terms confirmed.
+- Preview (port 4322) serves search + assets (200). Dev server (4321) has no index (search shows fallback).
+- Branch `phase-5-search` not yet committed/pushed.
+
+### Next actions
+
+- Commit Phase 5 → push → PR → merge.
+- Phase 6: production stack (astro-builder + rebuild-hook + web/nginx; webhook rebuilds).
+
+### Test results
+
+- 30 unit tests pass. Build: 15 pages + pagefind index (3 pages, 101 words, 2 filters).
+
+### Notes
+
+- Pagefind index is build-time only → search works on build/preview, not `astro dev`.
+- Watch CI: pagefind ships per-platform binaries (optionalDependencies); the linux binary must resolve in CI.
