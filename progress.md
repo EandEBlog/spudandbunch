@@ -187,3 +187,31 @@
 
 - Pagefind index is build-time only → search works on build/preview, not `astro dev`.
 - Watch CI: pagefind ships per-platform binaries (optionalDependencies); the linux binary must resolve in CI.
+
+## Session 7 — 2026-06-07
+
+### Done
+
+- Merged PR #6 (Phase 5). Web server decision: **Caddy** (auto-HTTPS).
+- **Phase 6 (Production Stack) COMPLETE** on branch `phase-6-production`:
+  - `apps/rebuild-hook/` — dependency-free Node webhook listener: `/webhook` + `/rebuild` + `/health`, debounce + serialize, builds `apps/web` and publishes to the shared `site` volume only on success; `X-Webhook-Secret` auth. + Dockerfile.
+  - `apps/web/Caddyfile` (env `SITE_ADDRESS`, auto-HTTPS, 404 fallback) + `src/pages/404.astro`.
+  - `apps/cms/Dockerfile` (prod: build admin + `strapi start`).
+  - `seed/webhook.ts` — reproducible webhook registration when `REBUILD_WEBHOOK_URL` set (best-effort, manual fallback).
+  - `docker-compose.yml` (prod): postgres + strapi + rebuild-hook + web, named volumes (pgdata, strapi_uploads, site, caddy_data/config), healthchecks; secrets from gitignored root `.env`. Updated root `.env.example`.
+
+### Current state
+
+- Verified: hook builds+publishes in ~3s; Caddy serves homepage/posts/pagefind/404; `/rebuild` 202 (bad secret 401); **CMS stopped → site still 200** (zero runtime dependency).
+- Prod compose config valid. Prod Strapi image build is slow (large npm install) — runs the standard Strapi build; left building in background.
+
+### Next actions
+
+- Commit Phase 6 → push → PR → merge.
+- Phase 7: author preview (single-page draft render service).
+
+### Notes
+
+- Builder is consolidated into rebuild-hook (no docker-socket one-shot container needed).
+- `strapi.webhookStore` isn't on the public Strapi TS type → access via a typed `unknown` cast + container `get` fallback.
+- Root `.env` (gitignored) drives the prod stack; dev stack still uses `apps/cms/.env`.

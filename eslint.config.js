@@ -3,6 +3,7 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import astro from 'eslint-plugin-astro';
 import prettier from 'eslint-config-prettier';
+import globals from 'globals';
 
 export default [
   // Ignore build output and generated files everywhere.
@@ -15,6 +16,12 @@ export default [
 
   // TypeScript recommendations (non type-checked; fast, no project service needed).
   ...tseslint.configs.recommended,
+
+  // Plain JS/MJS files (build config, the rebuild-hook server) run in Node.
+  {
+    files: ['**/*.{js,mjs,cjs}'],
+    languageOptions: { globals: { ...globals.node } },
+  },
 
   // Astro component recommendations (sets up the Astro parser for .astro files).
   ...astro.configs.recommended,

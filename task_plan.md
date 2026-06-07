@@ -9,7 +9,7 @@ and webhook-driven rebuilds — all enforced by ESLint/Prettier, Husky hooks, Vi
 
 ## Current Phase
 
-Phase 6
+Phase 7
 
 ## Source of Truth
 
@@ -73,13 +73,14 @@ Phase 6
 
 ### Phase 6: Production Stack (build + serve + rebuild)
 
-- [ ] `astro-builder` one-shot container (build + Pagefind → shared `dist` volume)
-- [ ] `rebuild-hook` Node service: receives Strapi webhook, debounces, serializes, triggers build; manual "rebuild now" endpoint
-- [ ] `web` (nginx or Caddy) serving static `dist`; only public-facing service
-- [ ] `docker-compose.yml` (prod) wiring all services on internal network
-- [ ] Strapi webhook configured to call `rebuild-hook` on publish/update/delete
-- **Acceptance:** Publish in Strapi → site updates within ~1–2 min; public site has zero runtime dependency on Strapi/Postgres.
-- **Status:** pending
+- [x] Builder consolidated into `rebuild-hook` (runs `astro build && pagefind`) — avoids a docker-socket-controlled one-shot container; publishes to the shared `site` volume only on success (failed build keeps the previous site)
+- [x] `rebuild-hook` Node service (dependency-free): webhook + manual `/rebuild` + `/health`; debounces and serializes builds; `X-Webhook-Secret` auth
+- [x] `web` = **Caddy** (decided) serving the static `site` volume; only public service; auto-HTTPS via `SITE_ADDRESS` domain; 404 fallback
+- [x] `docker-compose.yml` (prod): postgres + strapi (prod Dockerfile) + rebuild-hook + web, named volumes, healthchecks; secrets from gitignored root `.env`
+- [x] Strapi webhook registered reproducibly in bootstrap (`seedRebuildWebhook`, when `REBUILD_WEBHOOK_URL` set); manual fallback documented
+- **Acceptance:** ✅ Verified — rebuild-hook builds + publishes in ~3s; Caddy serves homepage/posts/pagefind/404; manual `/rebuild` 202 (wrong secret 401); **with Strapi + Postgres stopped the site still serves 200 with content** (zero runtime dependency).
+- **Status:** complete
+- **Notes:** Verified the hook+Caddy slice against the dev Strapi's content. Prod Strapi image build + full-stack publish flow exercised separately. `web` is the only public service; Strapi admin behind its own login.
 
 ### Phase 7: Author Preview (single-page)
 
@@ -90,8 +91,8 @@ Phase 6
 
 ## Decisions Pending (implementation-time)
 
-- nginx vs Caddy for `web` (Caddy = automatic HTTPS).
-- Whether to ship the optional recipe `steps` field in v1 (default: yes, falls back to body).
+- ~~nginx vs Caddy for `web`~~ → **DECIDED: Caddy** (automatic HTTPS). [Phase 6]
+- Whether to ship the optional recipe `steps` field in v1 → shipped (the schema includes `steps`).
 - Deployment host (gates future CD — out of scope for v1).
 
 ## Errors Encountered
