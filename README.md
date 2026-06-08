@@ -193,8 +193,10 @@ Built in phases (see [`task_plan.md`](task_plan.md)):
 
 - ✅ Phase 1 — repo & tooling skeleton
 - ✅ Phase 2 — Strapi CMS + Postgres (dockerized)
-- 🚧 Phase 3 — Astro data layer
-- ⬜ Phase 4 — presentation + theme (Photo Masonry)
-- ⬜ Phase 5 — Pagefind search
-- ⬜ Phase 6 — production stack (build + serve + webhook rebuilds)
-- ⬜ Phase 7 — author preview
+- ✅ Phase 3 — Astro data layer
+- ✅ Phase 4 — presentation + theme (Photo Masonry)
+- ✅ Phase 5 — Pagefind search
+- ✅ Phase 6 — production stack (build + serve + webhook rebuilds)
+- ✅ Phase 7 — author preview
+
+**v1 feature-complete.**
