@@ -10,8 +10,19 @@ describe('mediaUrl', () => {
     expect(mediaUrl('uploads/photo.jpg')).toBe(`${STRAPI_URL}/uploads/photo.jpg`);
   });
 
-  it('leaves already-absolute URLs unchanged', () => {
+  it('leaves external (non-upload) absolute URLs unchanged', () => {
     expect(mediaUrl('https://cdn.example.com/x.jpg')).toBe('https://cdn.example.com/x.jpg');
+  });
+
+  it('re-anchors an absolute upload URL (Strapi blocks embed these) to STRAPI_URL', () => {
+    // Strapi stores inline body images with an absolute host that may not be
+    // reachable at build/preview time; we normalize it to the current host.
+    expect(mediaUrl('http://localhost:1337/uploads/photo.jpg')).toBe(
+      `${STRAPI_URL}/uploads/photo.jpg`,
+    );
+    expect(mediaUrl('http://some-other-host:9000/uploads/a/b.jpg')).toBe(
+      `${STRAPI_URL}/uploads/a/b.jpg`,
+    );
   });
 
   it('returns undefined for empty/missing input', () => {

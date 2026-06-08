@@ -31,6 +31,9 @@ services:
     build:
       context: ./apps/cms
       dockerfile: Dockerfile
+      args:
+        # Public site URL for the admin's "View live site" link.
+        STRAPI_ADMIN_LIVE_URL: ${SITE_PUBLIC_URL:-http://localhost:8080}
     restart: unless-stopped
     depends_on:
       postgres:

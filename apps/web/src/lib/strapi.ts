@@ -33,7 +33,13 @@ export interface StrapiSingleResponse<T> {
  */
 export function mediaUrl(path: string | undefined | null): string | undefined {
   if (!path) return undefined;
-  if (/^https?:\/\//i.test(path)) return path;
+  // Re-anchor any upload URL to the current Strapi host. Strapi embeds ABSOLUTE
+  // URLs in rich-text blocks (e.g. http://localhost:1337/uploads/x.jpg), which
+  // break when the build/preview runs somewhere that host isn't Strapi. Media
+  // fields come back relative (/uploads/x.jpg). Normalize both to STRAPI_URL.
+  const uploads = path.indexOf('/uploads/');
+  if (uploads !== -1) return `${STRAPI_URL}${path.slice(uploads)}`;
+  if (/^https?:\/\//i.test(path)) return path; // external URL (e.g. CDN) — leave as-is
   return `${STRAPI_URL}${path.startsWith('/') ? '' : '/'}${path}`;
 }
 
