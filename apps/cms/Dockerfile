@@ -16,6 +16,9 @@ RUN npm install
 # App source, then build the admin panel for production.
 COPY . .
 ENV NODE_ENV=production
+# Public site URL for the admin's "View live site" link (baked into the admin).
+ARG STRAPI_ADMIN_LIVE_URL=http://localhost:8080
+ENV STRAPI_ADMIN_LIVE_URL=$STRAPI_ADMIN_LIVE_URL
 RUN npm run build
 
 EXPOSE 1337
