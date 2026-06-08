@@ -109,6 +109,75 @@ npm run format     # Prettier (write)
 
 ---
 
+## Production deployment (admin + live site)
+
+The production stack (`docker-compose.yml`) runs **everything**: Postgres, Strapi
+(admin + API), the `rebuild-hook`, the public site (Caddy), and the draft
+`preview` service. It's separate from the dev stack and has its **own database**.
+
+### One-time setup
+
+1. **Create `.env`** from `.env.example` and fill it in. Generate each secret,
+   e.g. `openssl rand -base64 16` (APP_KEYS needs 4, comma-separated). Set at
+   least `DATABASE_PASSWORD`, the Strapi secrets, `WEBHOOK_SECRET`,
+   `PREVIEW_SECRET`, `PREVIEW_URL`, `SITE_PUBLIC_URL`, and `SITE_ADDRESS`
+   (`:80` for plain HTTP, or your domain for automatic HTTPS). Leave
+   `PREVIEW_TOKEN` as a placeholder for now.
+
+2. **Bring up the stack** (first build takes a few minutes):
+
+   ```bash
+   docker compose up -d --build
+   ```
+
+3. **Create your admin user:**
+
+   ```bash
+   docker compose exec strapi strapi admin:create-user \
+     --email=you@example.com --password='YourStrongPass1' --firstname=You
+   ```
+
+4. **Create the preview token:** in the admin → **Settings → API Tokens →
+   Create** (Token type **Full access**, duration **Unlimited**). Copy it into
+   `.env` as `PREVIEW_TOKEN=…`, then apply it:
+
+   ```bash
+   docker compose up -d   # recreates the preview service with the real token
+   ```
+
+### Where everything runs
+
+| Service                     | Default URL                                          | Notes                                             |
+| --------------------------- | ---------------------------------------------------- | ------------------------------------------------- |
+| **Public site** (main page) | `http://localhost:${HTTP_PORT:-80}` (or your domain) | Static, served by Caddy                           |
+| **Strapi admin**            | `http://localhost:${STRAPI_PORT:-1337}/admin`        | Behind its own login; has a "View live site" link |
+| **Preview service**         | `http://localhost:${PREVIEW_PORT:-4323}`             | Reached via the admin's **Preview** button        |
+
+> Only the public site is meant to face the internet. The admin and preview are
+> for the author. On a real host, put the admin/preview behind your firewall,
+> VPN, or a subdomain.
+
+### Publishing workflow
+
+1. Write a post in the admin → **Save** (stores a draft).
+2. Click **Preview** to see the draft rendered exactly like the live page.
+3. Click **Publish** → Strapi's webhook triggers the `rebuild-hook` → the static
+   site rebuilds (Astro + Pagefind) → Caddy serves it. **Live in ~1–2 minutes.**
+
+### Managing the stack
+
+```bash
+docker compose logs -f rebuild-hook   # watch rebuilds
+docker compose down                   # stop (keeps data)
+docker compose down -v                # stop and WIPE all data (factory reset)
+docker compose up -d --build          # apply code changes
+```
+
+> The dev stack (`docker-compose.dev.yml`) and prod stack have **separate
+> databases** — content created in one is not in the other.
+
+---
+
 ## Quality gates & workflow
 
 - **Husky hooks:** pre-commit runs ESLint + Prettier + related tests on staged
